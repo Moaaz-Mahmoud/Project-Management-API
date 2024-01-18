@@ -2,7 +2,9 @@ Flask
 Flask-JWT-Extended
 Flask-Smorest
 Flask-SQLAlchemy
+SQLAlchemy
 passlib
 marshmallow
 python-dotenv
 psycopg2
+passlib
