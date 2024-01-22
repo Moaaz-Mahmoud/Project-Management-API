@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Enum
+from sqlalchemy import Enum
 import enum
 import uuid
 from db import db
@@ -14,5 +14,5 @@ class PermissionType(enum.Enum):
 class PermissionModel(db.Model):
     __tablename__ = "permissions"
 
-    id = Column(db.String(), primary_key=True, default=str(uuid.uuid4()), unique=True, nullable=False)
-    permission = Column(Enum(PermissionType), nullable=False)
+    id = db.Column(db.String(), primary_key=True, default=str(uuid.uuid4()), unique=True, nullable=False)
+    permission = db.Column(Enum(PermissionType), nullable=False)
