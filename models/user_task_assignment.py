@@ -2,10 +2,11 @@ from sqlalchemy import DateTime, ForeignKey
 from db import db
 
 
-class UserTaskModel(db.Model):
-    __tablename__ = "users_tasks"
+class UserTaskAssignmentModel(db.Model):
+    __tablename__ = "user_task_assignments"
 
-    user_id = db.Column(db.String(), ForeignKey('users.id'), primary_key=True)
-    task_id = db.Column(db.String(), ForeignKey('tasks.id'), primary_key=True)
+    id = db.Column(db.Integer(), primary_key=True, unique=True, nullable=False)
+    user_id = db.Column(db.String(), ForeignKey('users.id'))
+    task_id = db.Column(db.String(), ForeignKey('tasks.id'))
 
     created_at = db.Column(DateTime, default=db.func.current_timestamp())

@@ -15,10 +15,10 @@ class TaskStatus(enum.Enum):
 class TaskModel(db.Model):
     __tablename__ = "tasks"
 
-    id = db.Column(db.String(), primary_key=True, default=str(uuid.uuid4()), unique=True, nullable=False)
+    id = db.Column(db.Integer(), primary_key=True, unique=True, nullable=False)
     name = db.Column(db.String(255), nullable=False)
-    description = db.Column(db.String())
-    due_date = db.Column(DateTime)
+    description = db.Column(db.String(), nullable=True)
+    due_date = db.Column(DateTime, nullable=True)
     status = db.Column(Enum(TaskStatus), nullable=False)
 
     created_at = db.Column(DateTime, default=db.func.current_timestamp())
