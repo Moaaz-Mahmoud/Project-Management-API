@@ -1,4 +1,4 @@
-from sqlalchemy import DateTime, ForeignKey, Enum
+from sqlalchemy import DateTime, Enum
 import enum
 from db import db
 
@@ -16,7 +16,7 @@ class UserModel(db.Model):
     name = db.Column(db.String(255), nullable=False)
     username = db.Column(db.String(255), unique=True, nullable=False)
     email = db.Column(db.String(255), unique=True, nullable=False)
-    password_hash = db.Column(db.String(), nullable=False)
+    password = db.Column(db.String(), nullable=False)
     status = db.Column(Enum(UserStatus), default=UserStatus.PENDING, nullable=False)
     # workspace_id = db.Column(db.Integer(), ForeignKey('workspaces.id'), nullable=True, default=None)
 

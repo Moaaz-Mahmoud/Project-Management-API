@@ -1,9 +1,8 @@
-from sqlalchemy import DateTime, ForeignKey, Enum
-import enum
+from sqlalchemy import DateTime, ForeignKey
 from db import db
 
 
-class WorkspaceModel:
+class WorkspaceModel(db.Model):
     __tablename__ = 'workspaces'
 
     id = db.Column(db.Integer(), primary_key=True, unique=True, nullable=False)
