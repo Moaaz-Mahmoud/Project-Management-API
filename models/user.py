@@ -18,7 +18,7 @@ class UserModel(db.Model):
     email = db.Column(db.String(255), unique=True, nullable=False)
     password_hash = db.Column(db.String(), nullable=False)
     status = db.Column(Enum(UserStatus), default=UserStatus.PENDING, nullable=False)
-    workspace_id = db.Column(db.Integer(), ForeignKey('workspaces.id'))
+    # workspace_id = db.Column(db.Integer(), ForeignKey('workspaces.id'), nullable=True, default=None)
 
     created_at = db.Column(DateTime, default=db.func.current_timestamp())
     updated_at = db.Column(DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
