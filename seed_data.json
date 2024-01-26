@@ -1,7 +1,7 @@
 [
   {
     "name": "Admin",
-    "username": "admin",
+    "username": "admin_user",
     "email": "admin@meowpm.com",
     "password": "123",
     "status": "active"
@@ -22,7 +22,7 @@
   },
   {
     "name": "Meowing Cat",
-    "username": "meowc",
+    "username": "meow_cat",
     "email": "meowc@meowpm.com",
     "password": "123",
     "status": "pending"
