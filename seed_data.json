@@ -1,0 +1,30 @@
+[
+  {
+    "name": "Admin",
+    "username": "admin",
+    "email": "admin@meowpm.com",
+    "password": "123",
+    "status": "active"
+  },
+  {
+    "name": "Not Admin",
+    "username": "notadmin",
+    "email": "notadmin@meowpm.com",
+    "password": "123",
+    "status": "active"
+  },
+  {
+    "name": "Mr Suspendo",
+    "username": "suspendo",
+    "email": "suspendo@meowpm.com",
+    "password": "123",
+    "status": "suspended"
+  },
+  {
+    "name": "Meowing Cat",
+    "username": "meowc",
+    "email": "meowc@meowpm.com",
+    "password": "123",
+    "status": "pending"
+  }
+]

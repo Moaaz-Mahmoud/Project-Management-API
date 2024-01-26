@@ -4,20 +4,15 @@ from models.task import TaskStatus
 from models.user import UserStatus
 
 
-class PlainUserSchema(Schema):
+class UserSchema(Schema):
     id = fields.Int(dump_only=True)
     name = fields.Str(required=True)
     username = fields.Str(required=True)
     email = fields.Str(required=True)
-    password_hash = fields.Str(required=True, load_only=True)
-    status = fields.Enum(UserStatus, required=True, default=UserStatus.PENDING)
+    password = fields.Str(required=True, load_only=True)
+    status = fields.Enum(UserStatus, required=False)
     created_at = fields.DateTime()
     updated_at = fields.DateTime()
-
-
-class UserSchema(PlainUserSchema):
-    workspace_id = fields.Int(required=True)
-    # tasks = fields.List(fields.Nested(PlainTaskSchema()), dump_only=True)
 
 
 class TaskSchema(Schema):
@@ -28,3 +23,36 @@ class TaskSchema(Schema):
     status = fields.Enum(TaskStatus, required=True)
     created_at = fields.DateTime()
     updated_at = fields.DateTime()
+
+
+class TaskAssignmentSchema(Schema):
+    id = fields.Int(dump_only=True)
+    user_id = fields.Int(required=True, load_only=True)
+    task_id = fields.Int(required=True, load_only=True)
+    created_at = fields.DateTime()
+
+
+class WorkspaceSchema(Schema):
+    id = fields.Int(dump_only=True)
+    name = fields.Str(required=True)
+    user_id = fields.Int(required=True, load_only=True)
+    task_id = fields.Int(required=True, load_only=True)
+    created_at = fields.DateTime()
+    updated_at = fields.DateTime()
+
+
+class UserLoginSchema(Schema):
+    username_or_email = fields.Str(required=True)
+    password = fields.Str(required=True)
+
+
+class UserPatchSchema(Schema):
+    name = fields.Str(required=False)
+    username = fields.Str(required=False)
+    email = fields.Str(required=False)
+    password = fields.Str(required=False, load_only=True)
+    status = fields.Enum(UserStatus, required=False, default=UserStatus.PENDING)
+
+
+class UserIdArg(Schema):
+    id = fields.Int()
