@@ -14,6 +14,7 @@ from passlib.hash import pbkdf2_sha256 as hashing_algo
 
 from db import db
 from models import UserModel
+from models.user import UserStatus
 from schemas import UserSchema, UserLoginSchema, UserPatchSchema
 from utils.admin_privilege_required import admin_privilege_required
 from utils.credentials_util import CredentialsUtil
@@ -101,14 +102,17 @@ class User(MethodView):
         abort(401, message=f"Unauthorized: You do not have permission to access this resource")
 
     @jwt_required()
-    # @blp.arguments(UserIdArg, location='query')
     @blp.arguments(UserPatchSchema, location='json')
-    # @blp.response(200, UserSchema)
     def patch(self, user_data, user_id):
-        if user_id == get_jwt_identity() or user_id == int(os.getenv('ADMIN_USER_ID')):
+        if get_jwt_identity() == int(user_id) or get_jwt_identity() == int(os.getenv('ADMIN_USER_ID')):
             user = UserModel.query.get_or_404(user_id)
         else:
             abort(401, message="Unauthorized: You do not have permission to access this resource")
+
+        try:
+            user_data['status'] = UserStatus(user_data['status'])
+        except:  # If you can't do it, you don't need it. There's no status in the payload! Sorry, PEP 8 :)
+            pass
 
         try:
             for key, value in user_data.items():
@@ -124,15 +128,20 @@ class User(MethodView):
         except SQLAlchemyError:
             abort(500, message="An error occurred while inserting the user.")
 
+        try:
+            user_data['status'] = user_data['status'].value
+        except:  # If you can't do it, you don't need it. There's no status in the payload! Sorry, PEP 8 :)
+            pass
+
         return user_data
 
     @jwt_required()
     @blp.response(200, UserSchema)
     def delete(self, user_id):
-        if user_id != get_jwt_identity() and user_id != int(os.getenv('ADMIN_USER_ID')):
+        if get_jwt_identity() == int(user_id) or get_jwt_identity() == int(os.getenv('ADMIN_USER_ID')):
+            user = UserModel.query.get_or_404(user_id)
+        else:
             abort(401, message="Unauthorized: You do not have permission to access this resource")
-
-        user = UserModel.query.filter_by(id=user_id).first()
 
         if not user:
             abort(404, message="User doesn't exist")

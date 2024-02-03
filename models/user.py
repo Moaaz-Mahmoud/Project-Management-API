@@ -1,3 +1,6 @@
+from collections import defaultdict
+from datetime import datetime
+
 from sqlalchemy import DateTime, Enum
 import enum
 
@@ -27,3 +30,15 @@ class UserModel(db.Model):
     updated_at = db.Column(DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
     assignments = relationship('UserTaskAssignmentModel', cascade='all, delete-orphan', backref='user')
+
+    def as_dict(self):
+        object_as_dict = defaultdict()
+        for key in self.__table__.columns:
+            value = getattr(self, key.name)
+            if isinstance(value, enum.Enum):
+                value = value.value
+            elif isinstance(value, datetime):
+                value = value.isoformat()
+            object_as_dict[key.name] = value
+
+        return object_as_dict

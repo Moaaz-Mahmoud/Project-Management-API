@@ -1,30 +1,88 @@
-[
-  {
-    "name": "Admin",
-    "username": "admin_user",
-    "email": "admin@meowpm.com",
-    "password": "123",
-    "status": "active"
-  },
-  {
-    "name": "Not Admin",
-    "username": "notadmin",
-    "email": "notadmin@meowpm.com",
-    "password": "123",
-    "status": "active"
-  },
-  {
-    "name": "Mr Suspendo",
-    "username": "suspendo",
-    "email": "suspendo@meowpm.com",
-    "password": "123",
-    "status": "suspended"
-  },
-  {
-    "name": "Meowing Cat",
-    "username": "meow_cat",
-    "email": "meowc@meowpm.com",
-    "password": "123",
-    "status": "pending"
-  }
-]
+{
+  "users": [
+    {
+      "name": "Admin",
+      "username": "admin_user",
+      "email": "admin@meowpm.com",
+      "password": "123",
+      "status": "active"
+    },
+    {
+      "name": "Not Admin",
+      "username": "notadmin",
+      "email": "notadmin@meowpm.com",
+      "password": "123",
+      "status": "active"
+    },
+    {
+      "name": "Mr Suspendo",
+      "username": "suspendo",
+      "email": "suspendo@meowpm.com",
+      "password": "123",
+      "status": "suspended"
+    },
+    {
+      "name": "Meowing Cat",
+      "username": "meow_cat",
+      "email": "meowc@meowpm.com",
+      "password": "123",
+      "status": "pending"
+    }
+  ],
+  "tasks": [
+    {
+      "name": "Pet the cat",
+      "description": "Take some time to show affection to your feline friend.",
+      "due_date": "2024-02-01 14:00:00",
+      "status": "TODO"
+    },
+    {
+      "name": "Feed the goats",
+      "description": "Provide nourishing food to the goats in the barn.",
+      "due_date": "2024-02-15 16:00:00",
+      "status": "ACTIVE"
+    },
+    {
+      "name": "Play with the kittens",
+      "description": "Engage in playful activities with the adorable kittens.",
+      "due_date": "2024-02-12 19:00:00",
+      "status": "DONE"
+    },
+    {
+      "name": "Clean the goat pen",
+      "description": "Ensure a clean and comfortable environment for the goats.",
+      "due_date": "2024-02-18 17:30:00",
+      "status": "ON_HOLD"
+    }
+  ],
+  "assignments": [
+    {
+      "user_id": 1,
+      "task_id": 2
+    },
+    {
+      "user_id": 2,
+      "task_id": 1
+    },
+    {
+      "user_id": 1,
+      "task_id": 4
+    },
+    {
+      "user_id": 3,
+      "task_id": 2
+    },
+    {
+      "user_id": 4,
+      "task_id": 1
+    },
+    {
+      "user_id": 3,
+      "task_id": 4
+    },
+    {
+      "user_id": 4,
+      "task_id": 4
+    }
+  ]
+}

@@ -20,16 +20,9 @@ class TaskSchema(Schema):
     name = fields.Str(required=True)
     description = fields.Str(required=False)
     due_date = fields.DateTime(required=False)
-    status = fields.Enum(TaskStatus, required=True)
+    status = fields.Enum(TaskStatus, required=False)
     created_at = fields.DateTime()
     updated_at = fields.DateTime()
-
-
-class TaskAssignmentSchema(Schema):
-    id = fields.Int(dump_only=True)
-    user_id = fields.Int(required=True, load_only=True)
-    task_id = fields.Int(required=True, load_only=True)
-    created_at = fields.DateTime()
 
 
 class WorkspaceSchema(Schema):

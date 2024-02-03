@@ -1,7 +1,5 @@
-import enum
 import json
 import os
-from json import JSONEncoder
 
 from dotenv import load_dotenv
 from passlib.hash import pbkdf2_sha256 as hashing_algo
@@ -12,18 +10,23 @@ from flask_smorest import Api
 
 from db import db
 from blocklist import BLOCKLIST
-from models import UserModel
-from models.user import UserStatus
 
+import logging
+
+from models import UserModel, TaskModel, UserTaskAssignmentModel
+from models.user import UserStatus
 from resources.sample_resource import blp as sample_blueprint
 from resources.user import blp as user_blueprint
+from resources.task import blp as task_blueprint
+from resources.assignment import blp as assignment_blueprint
 
 
 def create_app(db_url=None):
     app = Flask(__name__)
+    logging.basicConfig(level=logging.INFO)
     load_dotenv()
 
-    app.config["API_TITLE"] = "Stores REST API"
+    app.config["API_TITLE"] = "Project Management REST API"
     app.config["API_VERSION"] = "v1"
     app.config["OPENAPI_VERSION"] = "3.0.3"
     app.config["OPENAPI_URL_PREFIX"] = "/"
@@ -45,9 +48,12 @@ def create_app(db_url=None):
         with app.app_context():
             with db.session.begin():
                 with open('seed_data.json', 'r') as file:
-                    users_data = json.load(file)
+                    data = json.load(file)
+                    users = data['users']
+                    tasks = data['tasks']
+                    assignments = data['assignments']
 
-                for user_data in users_data:
+                for user_data in users:
                     user = UserModel(
                         name=user_data['name'],
                         username=user_data['username'],
@@ -56,6 +62,24 @@ def create_app(db_url=None):
                         status=UserStatus[user_data['status'].upper()]  # Convert string to Enum
                     )
                     db.session.add(user)
+
+                for task_data in tasks:
+                    task = TaskModel(
+                        name=task_data['name'],
+                        description=task_data['description'],
+                        due_date=task_data['due_date'],
+                        status=task_data['status']
+                    )
+                    db.session.add(task)
+
+                for assignment_data in assignments:
+                    assignment = UserTaskAssignmentModel(
+                        user_id=assignment_data['user_id'],
+                        task_id=assignment_data['task_id'],
+                    )
+                    db.session.add(assignment)
+
+                db.session.commit()
 
     api = Api(app)
     app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
@@ -116,5 +140,7 @@ def create_app(db_url=None):
 
     api.register_blueprint(sample_blueprint)
     api.register_blueprint(user_blueprint)
+    api.register_blueprint(task_blueprint)
+    api.register_blueprint(assignment_blueprint)
 
     return app
