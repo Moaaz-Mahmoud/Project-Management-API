@@ -1,5 +1,8 @@
 from sqlalchemy import DateTime, Enum
 import enum
+
+from sqlalchemy.orm import relationship
+
 from db import db
 
 
@@ -22,3 +25,5 @@ class UserModel(db.Model):
 
     created_at = db.Column(DateTime, default=db.func.current_timestamp())
     updated_at = db.Column(DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
+
+    assignments = relationship('UserTaskAssignmentModel', cascade='all, delete-orphan', backref='user')
