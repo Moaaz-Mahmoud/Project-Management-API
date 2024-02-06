@@ -24,6 +24,7 @@ blp = Blueprint('Tasks', 'tasks')
 @blp.route('/users/<int:user_id>/tasks')
 class TaskList(MethodView):
     @jwt_required()
+    @blp.response(200, TaskSchema(many=True))
     def get(self, user_id):
         try:
             query = '''
@@ -59,9 +60,14 @@ class TaskList(MethodView):
 
     @jwt_required()
     @blp.arguments(TaskSchema)
+    @blp.response(201, TaskSchema)
     def post(self, task_data, user_id):
         try:
             task_data['status'] = TaskStatus(task_data['status'])  # To make it ready for the model
+        except ValueError as e:
+            abort(400, message=f'Invalid input: {str(e)}')
+
+        try:
             task = TaskModel(**task_data)
             db.session.add(task)
             db.session.commit()
@@ -89,6 +95,7 @@ class TaskList(MethodView):
 @blp.route('/tasks/<int:task_id>')
 class Task(MethodView):
     @jwt_required()
+    @blp.response(200)
     def get(self, task_id):
         task = TaskModel.query.get(task_id)
 
@@ -102,9 +109,14 @@ class Task(MethodView):
 
     @jwt_required()
     @blp.arguments(TaskSchema)
+    @blp.response(200)
     def patch(self, task_data, task_id):
         task = TaskModel.query.get(task_id)
-        task_data['status'] = TaskStatus(task_data['status'])  # To make it ready for the model
+
+        try:
+            task_data['status'] = TaskStatus(task_data['status'])  # To make it ready for the model
+        except ValueError as e:
+            abort(400, message=f'Invalid input: {str(e)}')
 
         if not task:
             abort(404, message="Task doesn't exist")
@@ -129,6 +141,7 @@ class Task(MethodView):
         return task_data
 
     @jwt_required()
+    @blp.response(200)
     def delete(self, task_id):
         task = TaskModel.query.get_or_404(task_id)
 

@@ -1,6 +1,5 @@
 from marshmallow import Schema, fields
 
-from models.task import TaskStatus
 from models.user import UserStatus
 
 
@@ -20,7 +19,7 @@ class TaskSchema(Schema):
     name = fields.Str(required=True)
     description = fields.Str(required=False)
     due_date = fields.DateTime(required=False)
-    status = fields.Enum(TaskStatus, required=False)
+    status = fields.Str(required=False)
     created_at = fields.DateTime()
     updated_at = fields.DateTime()
 
@@ -45,7 +44,3 @@ class UserPatchSchema(Schema):
     email = fields.Str(required=False)
     password = fields.Str(required=False, load_only=True)
     status = fields.Enum(UserStatus, required=False, default=UserStatus.PENDING)
-
-
-class UserIdArg(Schema):
-    id = fields.Int()

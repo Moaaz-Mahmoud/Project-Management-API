@@ -59,6 +59,7 @@ class UserRegister(MethodView):
 @blp.route('/login')
 class UserLogin(MethodView):
     @blp.arguments(UserLoginSchema)
+    @blp.response(200)
     def post(self, user_credentials):
         username_email = user_credentials.get('username_or_email')
         password = user_credentials.get('password')
@@ -91,13 +92,14 @@ class UserLogin(MethodView):
 @blp.route("/logout")
 class UserLogout(MethodView):
     @jwt_required()
+    @blp.response(200)
     def post(self):
         try:
             jti = get_jwt()["jti"]
             BLOCKLIST.add(jti)
-            return {'message': 'Successfully logged out'}, 200
+            return {'message': 'Successfully logged out'}
         except (JWTDecodeError, ExpiredSignatureError, InvalidTokenError):
-            abort(401, message='Invalid or expired token. Please log in again.')
+            abort(401, message='Not logged in.')
         except Exception as e:
             abort(500, message=f'{GENERIC500}: {str(e)}')
 
@@ -105,6 +107,7 @@ class UserLogout(MethodView):
 @blp.route("/refresh")
 class TokenRefresh(MethodView):
     @jwt_required(refresh=True)
+    @blp.response(200)
     def post(self):
         try:
             current_user = get_jwt_identity()
@@ -112,7 +115,7 @@ class TokenRefresh(MethodView):
             # Make it clear that when to add the refresh token to the blocklist will depend on the app design
             jti = get_jwt()["jti"]
             BLOCKLIST.add(jti)
-            return {"access_token": new_token}, 200
+            return {"access_token": new_token}
         except (JWTDecodeError, ExpiredSignatureError, InvalidTokenError):
             abort(401, message='Invalid or expired token. Please log in again.')
         except Exception as e:
@@ -138,6 +141,7 @@ class User(MethodView):
 
     @jwt_required()
     @blp.arguments(UserPatchSchema, location='json')
+    @blp.response(200)
     def patch(self, user_data, user_id):
         if get_jwt_identity() == int(user_id) or get_jwt_identity() == int(os.getenv('ADMIN_USER_ID')):
             user = UserModel.query.get_or_404(user_id)

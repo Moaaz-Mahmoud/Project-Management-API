@@ -18,6 +18,7 @@ blp = Blueprint('Assignments', 'assignments')
 @blp.route('/assign')
 class UserTaskAssignment(MethodView):
     @jwt_required()
+    @blp.response(201)
     def post(self):
         user_id = request.args['user_id']
         task_id = request.args['task_id']
@@ -46,6 +47,7 @@ class UserTaskAssignment(MethodView):
         }
 
     @jwt_required()
+    @blp.response(200)
     def delete(self):
         user_id = request.args['user_id']
         task_id = request.args['task_id']
