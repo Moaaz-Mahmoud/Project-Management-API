@@ -5,8 +5,11 @@ from dotenv import load_dotenv
 from flask.views import MethodView
 from flask_jwt_extended import jwt_required
 from flask_smorest import Blueprint, abort
-from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+from psycopg2 import OperationalError
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError, InvalidRequestError
+from sqlalchemy.orm.exc import FlushError, StaleDataError
 
+from constants import GENERIC500
 from db import db
 from models import TaskModel, UserTaskAssignmentModel
 from models.task import TaskStatus
@@ -22,30 +25,37 @@ blp = Blueprint('Tasks', 'tasks')
 class TaskList(MethodView):
     @jwt_required()
     def get(self, user_id):
-        query = '''
-            WITH associated_tasks AS (
-                SELECT task_id
-                FROM user_task_assignments
-                WHERE user_id = %s
-            )
-            SELECT *
-            FROM tasks
-            WHERE id IN (SELECT task_id FROM associated_tasks)
-        '''
+        try:
+            query = '''
+                WITH associated_tasks AS (
+                    SELECT task_id
+                    FROM user_task_assignments
+                    WHERE user_id = %s
+                )
+                SELECT *
+                FROM tasks
+                WHERE id IN (SELECT task_id FROM associated_tasks)
+            '''
 
-        connection = psycopg2.connect(database_url)
-        cursor = connection.cursor()
-        cursor.execute(query, (user_id,))
+            connection = psycopg2.connect(database_url)
+            cursor = connection.cursor()
+            cursor.execute(query, (user_id,))
 
-        associated_tasks = [row for row in cursor.fetchall()]
+            associated_tasks = [row for row in cursor.fetchall()]
 
-        keys = TaskModel.__table__.columns.keys()
-        serialized_tasks = [(dict(zip(keys, values))) for values in associated_tasks]
+            keys = TaskModel.__table__.columns.keys()
+            serialized_tasks = [(dict(zip(keys, values))) for values in associated_tasks]
 
-        cursor.close()
-        connection.close()
+            cursor.close()
+            connection.close()
 
-        return serialized_tasks
+            return serialized_tasks
+        except OperationalError as e:
+            abort(500, message=f"Database connection error: {str(e)}")
+        except psycopg2.Error as e:
+            abort(500, message=f"Database error: {str(e)}")
+        except Exception as e:
+            abort(500, message=f'{GENERIC500}: {str(e)}')
 
     @jwt_required()
     @blp.arguments(TaskSchema)
@@ -63,9 +73,14 @@ class TaskList(MethodView):
             db.session.add(assignment)
             db.session.commit()
         except IntegrityError as e:
-            abort(409, message=f'Error: {str(e)}')
-        except SQLAlchemyError:
-            abort(422)
+            db.session.rollback()
+            abort(409, message=f'Database error: {str(e)}')
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            abort(422, message=f'Database error: {str(e)}')
+        except Exception as e:
+            db.session.rollback()
+            abort(500, message=f'{GENERIC500}: {str(e)}')
 
         task_data['status'] = task_data['status'].value  # For serialization
         return task_data, 201
@@ -83,7 +98,7 @@ class Task(MethodView):
         try:
             return task.as_dict()
         except Exception as e:
-            abort(400, message=f'Error: {str(e)}')
+            abort(400, message=f'{GENERIC500}: {str(e)}')
 
     @jwt_required()
     @blp.arguments(TaskSchema)
@@ -105,6 +120,9 @@ class Task(MethodView):
         except SQLAlchemyError as e:
             db.session.rollback()
             abort(422, message=f'Error updating task: {str(e)}')
+        except Exception as e:
+            db.session.rollback()
+            abort(500, message=f"{GENERIC500}: {str(e)}")
 
         task_data['status'] = task_data['status'].value
 
@@ -112,7 +130,7 @@ class Task(MethodView):
 
     @jwt_required()
     def delete(self, task_id):
-        task = TaskModel.query.get(task_id)
+        task = TaskModel.query.get_or_404(task_id)
 
         if not task:
             abort(404, message="Task doesn't exist")
@@ -121,5 +139,11 @@ class Task(MethodView):
             db.session.delete(task)
             db.session.commit()
             return {'message': 'Task deleted successfully'}
-        except SQLAlchemyError as e:
-            abort(400, message=f'Error deleting task: {str(e)}')
+        except IntegrityError as e:
+            db.session.rollback()
+            abort(400, message=f'Database error: {str(e)}')
+        except (FlushError, InvalidRequestError, StaleDataError) as e:
+            db.session.rollback()
+            abort(400, message=f'Database error: {str(e)}')
+        except Exception as e:
+            abort(500, message=f"{GENERIC500}: {str(e)}")
