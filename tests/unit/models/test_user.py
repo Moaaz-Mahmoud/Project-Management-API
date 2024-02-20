@@ -8,7 +8,7 @@ from models import UserModel
 from models.user import UserStatus
 
 
-class TestTask(TestCase):
+class TestUser(TestCase):
     def test_create_user(self):
         now = datetime.now()
         user = UserModel(
