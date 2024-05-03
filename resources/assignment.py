@@ -23,7 +23,8 @@ class UserTaskAssignment(MethodView):
         user_id = request.args['user_id']
         task_id = request.args['task_id']
 
-        if get_jwt_identity() != user_id and get_jwt_identity() != int(os.getenv('ADMIN_USER_ID')):
+        jwt_identity = get_jwt_identity()
+        if jwt_identity != int(user_id) and jwt_identity != int(os.getenv('ADMIN_USER_ID')):
             abort(401, message=f'Unauthorized: You do not have permission to access this resource')
 
         assignment = UserTaskAssignmentModel(user_id=user_id, task_id=task_id)
@@ -31,9 +32,9 @@ class UserTaskAssignment(MethodView):
         try:
             db.session.add(assignment)
             db.session.commit()
-        except IntegrityError:
+        except IntegrityError as e:
             db.session.rollback()
-            abort(409, message=f'User #{user_id} already assigned to task #{task_id}')
+            abort(409, message=f'{str(e)}')
         except SQLAlchemyError as e:
             db.session.rollback()
             abort(422, message=f'Database error: {str(e)}')
@@ -52,7 +53,8 @@ class UserTaskAssignment(MethodView):
         user_id = request.args['user_id']
         task_id = request.args['task_id']
 
-        if get_jwt_identity() != user_id and get_jwt_identity() != int(os.getenv('ADMIN_USER_ID')):
+        jwt_identity = get_jwt_identity()
+        if jwt_identity != int(user_id) and jwt_identity != int(os.getenv('ADMIN_USER_ID')):
             abort(401, message=f'Unauthorized: You do not have permission to access this resource')
 
         assignment = UserTaskAssignmentModel.query.filter_by(user_id=user_id, task_id=task_id).first_or_404()
