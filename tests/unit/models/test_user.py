@@ -53,7 +53,4 @@ class TestUser(TestCase):
 
         user_dict = user.as_dict()
 
-        print(user_dict)
-        print(expected_dict)
-
         self.assertDictEqual(user_dict, expected_dict)
