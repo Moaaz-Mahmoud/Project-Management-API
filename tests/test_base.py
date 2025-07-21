@@ -25,7 +25,6 @@ class TestBase(TestCase):
 
         # app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('TEST_DATABASE_URL')
         with app.app_context():
-            db.init_app(app)
             db.create_all()
         # Get a test client
         self.test_client = app.test_client()
