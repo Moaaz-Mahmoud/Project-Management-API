@@ -32,11 +32,14 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    
     environment: Test
+
     env:
       TEST_DATABASE_URL: ${{ vars.TEST_DATABASE_URL }}
       JWT_SECRET_KEY: ${{ vars.JWT_SECRET_KEY }}
       ADMIN_USER_ID: ${{ vars.ADMIN_USER_ID }}
+
     services:
       postgres:
         image: postgres:16
@@ -53,6 +56,7 @@ jobs:
           --health-retries=5
 
     needs: build-image
+
     steps:
       - name: Pull Docker image
         run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/project-management-api:latest
