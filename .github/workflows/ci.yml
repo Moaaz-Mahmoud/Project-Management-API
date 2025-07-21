@@ -70,6 +70,7 @@ jobs:
       - name: Run tests inside container
         run: |
           docker run --rm \
+            --add-host=host.docker.internal:host-gateway \
             -e TEST_DATABASE_URL="$TEST_DATABASE_URL" \
             -e JWT_SECRET_KEY="$JWT_SECRET_KEY" \
             -e ADMIN_USER_ID="$ADMIN_USER_ID" \
