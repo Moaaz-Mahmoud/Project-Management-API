@@ -32,6 +32,9 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    environment: Test
+    env:
+      TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
     services:
       postgres:
         image: postgres:16
