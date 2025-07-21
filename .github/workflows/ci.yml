@@ -32,7 +32,7 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-    
+
     environment: Test
 
     env:
@@ -48,7 +48,7 @@ jobs:
         env:
           POSTGRES_USER: alice
           POSTGRES_PASSWORD: bob
-          POSTGRES_DB: project_test_db
+          POSTGRES_DB: project_management_tool_db
         options: >-
           --health-cmd="pg_isready -U alice"
           --health-interval=10s
@@ -58,6 +58,12 @@ jobs:
     needs: build-image
 
     steps:
+      - name: Show env values
+        run: |
+          echo "TEST_DATABASE_URL=$TEST_DATABASE_URL"
+          echo "JWT_SECRET_KEY=$JWT_SECRET_KEY"
+          echo "ADMIN_USER_ID=$ADMIN_USER_ID"
+
       - name: Pull Docker image
         run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/project-management-api:latest
 
