@@ -53,10 +53,14 @@ jobs:
       - name: Pull Docker image
         run: docker pull ${{ secrets.DOCKERHUB_USERNAME }}/project-management-api:latest
 
-      - name: Run tests
+      - name: Run tests inside container
         run: |
-          docker run --rm ${{ secrets.DOCKERHUB_USERNAME }}/project-management-api:latest \
-          python3 -m unittest discover -s tests
+          docker run --rm \
+            -e TEST_DATABASE_URL="$TEST_DATABASE_URL" \
+            -e JWT_SECRET_KEY="$JWT_SECRET_KEY" \
+            -e ADMIN_USER_ID="$ADMIN_USER_ID" \
+            ${{ secrets.DOCKERHUB_USERNAME }}/project-management-api:latest \
+            python3 -m unittest discover -s tests
       
       - name: Dummy step to ensure the job runs
         run: echo "Tests completed successfully"
